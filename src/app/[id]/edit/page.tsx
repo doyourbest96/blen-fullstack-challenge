@@ -3,7 +3,8 @@ import { tasks } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { notFound, redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { CancelButton } from '@/components/CancelButton';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 async function updateTask(id: number, formData: FormData) {
   'use server';
@@ -29,11 +30,7 @@ async function updateTask(id: number, formData: FormData) {
   redirect(`/${id}`);
 }
 
-export default async function EditTask({
-  params: { id },
-}: {
-  params: { id: string };
-}) {
+export default async function EditTask({ params: { id } }: { params: { id: string } }) {
   const task = await db.query.tasks.findFirst({
     where: eq(tasks.id, parseInt(id)),
   });
@@ -43,56 +40,73 @@ export default async function EditTask({
   }
 
   return (
-    <main className="container mx-auto p-4">
-      <h1 className="mb-6 text-2xl font-bold">Edit Task</h1>
+    <main className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto max-w-2xl px-4">
+        <Link
+          href={`/${id}`}
+          className="mb-6 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back to Task
+        </Link>
 
-      <form action={updateTask.bind(null, task.id)} className="space-y-4">
-        <div>
-          <label htmlFor="title" className="mb-1 block text-sm font-medium">
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            defaultValue={task.title}
-            required
-            className="w-full rounded border p-2"
-          />
-        </div>
+        <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
+          <h1 className="mb-6 text-2xl font-bold text-gray-900">Edit Task</h1>
 
-        <div>
-          <label htmlFor="description" className="mb-1 block text-sm font-medium">
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={task.description ?? ''}
-            rows={3}
-            className="w-full rounded border p-2"
-          />
-        </div>
+          <form action={updateTask.bind(null, task.id)} className="space-y-6">
+            <div>
+              <label htmlFor="title" className="mb-1 block text-sm font-medium text-gray-700">
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                defaultValue={task.title}
+                required
+                className="w-full rounded-md border border-gray-300 px-4 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-        <div>
-          <label htmlFor="dueDate" className="mb-1 block text-sm font-medium">
-            Due Date
-          </label>
-          <input
-            type="date"
-            id="dueDate"
-            name="dueDate"
-            defaultValue={task.dueDate}
-            required
-            className="w-full rounded border p-2"
-          />
-        </div>
+            <div>
+              <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                defaultValue={task.description ?? ''}
+                rows={4}
+                className="w-full rounded-md border border-gray-300 px-4 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-        <div className="flex gap-4">
-          <Button type="submit">Update Task</Button>
-          <CancelButton />
+            <div>
+              <label htmlFor="dueDate" className="mb-1 block text-sm font-medium text-gray-700">
+                Due Date
+              </label>
+              <input
+                type="date"
+                id="dueDate"
+                name="dueDate"
+                defaultValue={task.dueDate}
+                required
+                className="w-full rounded-md border border-gray-300 px-4 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <Button type="submit" size="lg">
+                Save Changes
+              </Button>
+              <Link href={`/${id}`}>
+                <Button variant="outline" size="lg">
+                  Cancel
+                </Button>
+              </Link>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </main>
   );
 }

@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import DeleteTask from './delete-task';
+import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export default async function TaskDetail({ params: { id } }: { params: { id: string } }) {
   const task = await db.query.tasks.findFirst({
@@ -17,39 +18,46 @@ export default async function TaskDetail({ params: { id } }: { params: { id: str
   }
 
   return (
-    <main className="container mx-auto p-4">
-      <div className="mx-auto max-w-2xl rounded-lg bg-white p-6 shadow">
-        <div className="mb-6 flex items-start justify-between">
-          <h1 className="text-2xl font-bold">{task.title}</h1>
-          <div className="flex gap-2">
-            <Link href={`/${id}/edit`}>
-              <Button variant="outline">Edit</Button>
-            </Link>
-            <DeleteTask id={task.id} />
-          </div>
-        </div>
+    <main className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto max-w-2xl px-4">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back to Tasks
+        </Link>
 
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-500">Due Date</h2>
-            <p>{format(new Date(task.dueDate), 'PP')}</p>
-          </div>
-
-          <div>
-            <h2 className="text-sm font-semibold text-gray-500">Description</h2>
-            <p className="whitespace-pre-wrap">{task.description}</p>
+        <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="mb-8 flex items-start justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
+            <div className="flex gap-3">
+              <Link href={`/${id}/edit`}>
+                <Button variant="outline">Edit Task</Button>
+              </Link>
+              <DeleteTask id={task.id} />
+            </div>
           </div>
 
-          <div>
-            <h2 className="text-sm font-semibold text-gray-500">Created</h2>
-            <p>{format(new Date(task.createdAt!), 'PP')}</p>
-          </div>
-        </div>
+          <div className="space-y-6">
+            <div className="flex items-center text-gray-500">
+              <Calendar className="mr-2 h-5 w-5" />
+              <span>Due {format(new Date(task.dueDate), 'MMMM d, yyyy')}</span>
+            </div>
 
-        <div className="mt-8">
-          <Link href="/">
-            <Button variant="outline">Back to Tasks</Button>
-          </Link>
+            {task.description && (
+              <div className="border-t border-gray-100 pt-6">
+                <h2 className="mb-3 text-sm font-semibold text-gray-900">Description</h2>
+                <p className="whitespace-pre-wrap text-gray-600">{task.description}</p>
+              </div>
+            )}
+
+            <div className="border-t border-gray-100 pt-6">
+              <div className="flex items-center text-sm text-gray-500">
+                <Clock className="mr-2 h-4 w-4" />
+                <span>Created on {format(new Date(task.createdAt!), 'MMMM d, yyyy')}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
